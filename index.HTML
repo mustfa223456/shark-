@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>موقع المستفيد - متجر الصور والفيديوهات</title>
+  <style>
+    /* إعدادات أساسية */
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+      color: #333;
+      transition: background-color 0.3s ease;
+    }
+
+    header {
+      background-color: #2c3e50;
+      padding: 10px 0;
+      text-align: center;
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    nav ul li {
+      display: inline-block;
+      margin: 0 15px;
+    }
+
+    nav ul li a {
+      color: white;
+      text-decoration: none;
+      font-size: 18px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 20px;
+      color: #2c3e50;
+    }
+
+    button {
+      background-color: #3498db;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    input[type="file"] {
+      display: block;
+      margin: 10px auto;
+    }
+
+    /* تنسيق المعرض */
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .gallery img, .gallery video {
+      max-width: 150px;
+      height: auto;
+      margin: 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.3s ease-in-out;
+      position: relative;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .gallery img:hover, .gallery video:hover {
+      transform: scale(1.05);
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: red;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 5px;
+    }
+
+    /* البحث */
+    #search-section {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    #searchButton {
+      margin-top: 10px;
+    }
+
+    #resetButton {
+      margin-top: 10px;
+      background-color: #e74c3c;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* الوضع المظلم */
+    body.dark-mode {
+      background-color: #2c3e50;
+      color: #f5f5f5;
+    }
+
+    /* تخصيص الصور 360 درجة */
+    .image360 {
+      width: 100%;
+      height: 300px;
+      background-color: #000;
+    }
+
+    /* خيارات التفاعل مع المستخدم */
+    .like-btn {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background-color: #e74c3c;
+      color: white;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 12px;
+      border-radius: 5px;
+    }
+
+    .like-btn:hover {
+      background-color: #c0392b;
+    }
+
+    /* ملصقات تفاعلية */
+    .sticker {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 5px;
+      border-radius: 5px;
+    }
+
+    /* تملك الموقع */
+    footer {
+      background-color: #2c3e50;
+      padding: 20px;
+      color: white;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    /* التكبير عند النقر */
+    .lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .lightbox img {
+      width: auto;
+      height: auto;
+      max-width: none;
+      max-height: none;
+      display: block;
+    }
+
+    .lightbox.show {
+      display: flex;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: red;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 18px;
+      border-radius: 5px;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <ul>
+        <li><a href="#">الرئيسية</a></li>
+        <li><a href="#">الصور</a></li>
+        <li><a href="#">الفيديوهات</a></li>
+        <li><a href="#">البحث</a></li>
+        <li><a href="#" id="themeToggle">الوضع المظلم</a></li> <!-- زر الوضع المظلم -->
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section id="upload-section">
+      <h2>رفع الصور والفيديوهات</h2>
+      <form id="uploadForm" class="hidden">
+        <input type="file" id="fileInput" multiple accept="image/*, video/*">
+        <button type="submit">رفع الملفات</button>
+      </form>
+      <p id="errorMessage" style="color: red; display: none;">الرمز غير صحيح. يرجى المحاولة مرة أخرى.</p>
+      <button id="verifyButton">التحقق من الرمز للوصول إلى الرفع</button> <!-- زر التحقق -->
+    </section>
+
+    <section id="gallery">
+      <h2>معرض الصور</h2>
+      <div id="imageGallery" class="gallery"></div>
+      <h2>معرض الفيديوهات</h2>
+      <div id="videoGallery" class="gallery"></div>
+    </section>
+
+    <section id="search-section">
+      <h2>البحث</h2>
+      <input type="text" id="searchInput" placeholder="ابحث عن صورة أو فيديو...">
+      <button id="searchButton">بحث</button>
+      <button id="resetButton">إرجاع إلى كل العناصر</button> <!-- زر الرجوع -->
+    </section>
+
+    <section id="like-section">
+      <h2>الإعجابات</h2>
+      <button class="like-btn">إعجاب</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2024 موقع المستفيد - جميع الحقوق محفوظة</p>
+  </footer>
+
+  <!-- نافذة التكبير (Lightbox) -->
+  <div id="lightbox" class="lightbox">
+    <button class="lightbox-close" id="lightboxClose">×</button>
+    <img id="lightboxImage" src="" alt="صورة مكبرة">
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const uploadForm = document.getElementById('uploadForm');
+    const imageGallery = document.getElementById('imageGallery');
+    const videoGallery = document.getElementById('videoGallery');
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    const resetButton = document.getElementById('resetButton');
+    const verifyButton = document.getElementById('verifyButton');
+    const errorMessage = document.getElementById('errorMessage');
+    const themeToggle = document.getElementById('themeToggle');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImage = document.getElementById('lightboxImage');
+    const lightboxClose = document.getElementById('lightboxClose');
+
+    const correctCode = 'tofe1998';
+
+    // التحقق من رمز التملك
+    verifyButton.addEventListener('click', () => {
+      const enteredCode = prompt("أدخل رمز التملك للوصول إلى رفع الملفات");
+      if (enteredCode === correctCode) {
+        uploadForm.classList.remove('hidden');
+        errorMessage.style.display = 'none';
+        verifyButton.style.display = 'none';
+      } else {
+        errorMessage.style.display = 'block';
+      }
+    });
+
+    // رفع الصور والفيديوهات
+    fileInput.addEventListener('change', (e) => {
+      const files = e.target.files;
+      for (const file of files) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (file.type.startsWith('image/')) {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.alt = file.name;
+            img.addEventListener('click', () => showLightbox(img.src));
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'حذف';
+            deleteBtn.classList.add('delete-btn');
+            deleteBtn.addEventListener('click', () => deleteFile(img, deleteBtn));
+            img.appendChild(deleteBtn);
+            imageGallery.appendChild(img);
+          } else if (file.type.startsWith('video/')) {
+            const video = document.createElement('video');
+            video.src = e.target.result;
+            video.controls = true;
+            video.addEventListener('click', () => showLightbox(video.src));
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'حذف';
+            deleteBtn.classList.add('delete-btn');
+            deleteBtn.addEventListener('click', () => deleteFile(video, deleteBtn));
+            video.appendChild(deleteBtn);
+            videoGallery.appendChild(video);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // إظهار نافذة التكبير
+    function showLightbox(src) {
+      lightbox.classList.add('show');
+      lightboxImage.src = src;
+    }
+
+    // إغلاق نافذة التكبير
+    lightboxClose.addEventListener('click', () => {
+      lightbox.classList.remove('show');
+    });
+
+    // حذف الملف
+    function deleteFile(element, btn) {
+      element.remove();
+      btn.remove();
+      savePinnedFiles();
+    }
+
+    // حفظ الملفات المثبتة
+    function savePinnedFiles() {
+      const pinnedFiles = [];
+      const pinnedImgs = imageGallery.querySelectorAll('img');
+      pinnedImgs.forEach((img) => pinnedFiles.push(img.src));
+      const pinnedVideos = videoGallery.querySelectorAll('video');
+      pinnedVideos.forEach((video) => pinnedFiles.push(video.src));
+      localStorage.setItem('pinnedFiles', JSON.stringify(pinnedFiles));
+    }
+
+    // استرجاع الفيديوهات والصور المثبتة عند تحميل الصفحة
+    function loadPinnedFiles() {
+      const pinnedFiles = JSON.parse(localStorage.getItem('pinnedFiles') || '[]');
+      pinnedFiles.forEach((fileSrc) => {
+        const img = document.createElement('img');
+        img.src = fileSrc;
+        img.alt = 'صورة مثبتة';
+        imageGallery.appendChild(img);
+        const video = document.createElement('video');
+        video.src = fileSrc;
+        video.controls = true;
+        videoGallery.appendChild(video);
+      });
+    }
+
+    window.onload = loadPinnedFiles;
+
+    // إضافة وظيفة الوضع المظلم
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+
+    // البحث
+    searchButton.addEventListener('click', () => {
+      const query = searchInput.value.toLowerCase();
+      searchGallery(query);
+    });
+
+    resetButton.addEventListener('click', () => {
+      searchInput.value = '';
+      searchGallery('');
+    });
+
+    // البحث في المعرض
+    function searchGallery(query) {
+      const imgs = imageGallery.querySelectorAll('img');
+      const videos = videoGallery.querySelectorAll('video');
+      imgs.forEach((img) => {
+        img.style.display = img.alt.toLowerCase().includes(query) ? 'block' : 'none';
+      });
+      videos.forEach((video) => {
+        video.style.display = video.alt.toLowerCase().includes(query) ? 'block' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>
